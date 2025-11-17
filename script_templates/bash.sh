@@ -10,10 +10,7 @@ apt download e2tools
 dpkg-deb -x e2tools_*.deb .
 # SETUP END -----------------------------------
 
-
-# Use tools (in-place, no install)
-./usr/bin/e2mkdir disk.img:/test
-./usr/bin/e2cp myfile.txt disk.img:/test/file.txt
+E2="./usr/bin"
 
 # create 16MB image file
 dd if=/dev/null of=test.img bs=1 count=1 seek=16M
@@ -36,10 +33,9 @@ e2ls -l test.img:/foo
 # remove file again
 e2rm test.img:/foo/README.md
 
-
-
-
-
+# Use tools
+./usr/bin/e2mkdir disk.img:/test
+./usr/bin/e2cp myfile.txt disk.img:/test/file.txt
 
 # CLEAN UP ---------------------------------------
 cd /
