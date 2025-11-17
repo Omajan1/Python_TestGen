@@ -1,0 +1,13 @@
+filesystem:
+  dirs:
+    - /etc
+    - /home
+    - /home/user
+    - /var/log
+    - /test
+
+  files:
+    - path: /test/test.txt
+      content: |
+        Hello world
+        This is inside the image.
