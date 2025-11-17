@@ -1,5 +1,6 @@
 import argparse
 
+# dont use dependencies, so manually parse (todo)
 
 class Generator():
     def __init__(self, args):
