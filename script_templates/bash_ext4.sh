@@ -1,16 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
-# Figure out where this script lives (scripts/)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR=$(pwd)
+OUTPUT_DIR="."
+NAME="ext4-test"
 
-# Output folder next to scripts/
-OUTPUT_DIR="${SCRIPT_DIR}/../output_images"
-mkdir -p "$OUTPUT_DIR"
-
-# Paths
-IMG_PATH="${OUTPUT_DIR}/ext4-test.img"
-MNT_DIR="${OUTPUT_DIR}/mounted"
+IMG_PATH="${OUTPUT_DIR}/${NAME}.img"
+MNT_DIR="/mnt/${NAME}_mnt"
 
 # -------------------------
 # CLEAN OPTION
@@ -41,8 +37,8 @@ fi
 # NORMAL OPERATION
 # -------------------------
 
-# 100 MB test image.
-dd if=/dev/zero of="$IMG_PATH" bs=1M count=100
+# 10 MB test image.
+dd if=/dev/zero of="$IMG_PATH" bs=1M count=10
 
 # create filesystem inside image file.
 mkfs.ext4 -O ^has_journal -E lazy_itable_init=0,lazy_journal_init=0 "$IMG_PATH"
@@ -54,7 +50,7 @@ mkdir -p "$MNT_DIR"
 sudo mount -o loop "$IMG_PATH" "$MNT_DIR"
 
 # Optional: give your user ownership so you don't need sudo for every file op
-sudo chown -R "$USER:$USER" "$MNT_DIR"
+# sudo chown -R "$USER:$USER" "$MNT_DIR"
 
 # Space for normal filesystem calls/operations.
 cd "$MNT_DIR"
