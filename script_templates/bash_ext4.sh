@@ -8,35 +8,6 @@ NAME="ext4-test"
 IMG_PATH="${OUTPUT_DIR}/${NAME}.img"
 MNT_DIR="/mnt/${NAME}_mnt"
 
-# -------------------------
-# CLEAN OPTION
-# -------------------------
-if [[ "$1" == "--clean" ]]; then
-    echo ">> Unmounting and cleaning image..."
-
-    # Unmount if mounted
-    if mountpoint -q "$MNT_DIR"; then
-        sudo umount "$MNT_DIR"
-        echo ">> Unmounted $MNT_DIR"
-    else
-        echo ">> $MNT_DIR is not mounted"
-    fi
-
-    # Delete image
-    if [[ -f "$IMG_PATH" ]]; then
-        rm "$IMG_PATH"
-        echo ">> Deleted $IMG_PATH"
-    else
-        echo ">> No image file found to delete"
-    fi
-
-    exit 0
-fi
-
-# -------------------------
-# NORMAL OPERATION
-# -------------------------
-
 # 10 MB test image.
 dd if=/dev/zero of="$IMG_PATH" bs=1M count=10
 
@@ -49,9 +20,6 @@ mkdir -p "$MNT_DIR"
 # Mount the filesystem using a loop device
 sudo mount -o loop "$IMG_PATH" "$MNT_DIR"
 
-# Optional: give your user ownership so you don't need sudo for every file op
-# sudo chown -R "$USER:$USER" "$MNT_DIR"
-
 # Space for normal filesystem calls/operations.
 cd "$MNT_DIR"
 mkdir -p testtxts
@@ -60,6 +28,9 @@ echo "helloworld" > testfile.txt
 
 # Manipulate the ext4 structures directly in the image file using debugfs
 
-# Done
-echo ">> Image created, mounted, and test file written."
-echo ">> To clean: ./bash_ext4.sh --clean"
+
+# CLEAN UP - Unmount after operations are done
+sudo umount "$MNT_DIR"
+
+echo ">> Image created"
+exit 0
