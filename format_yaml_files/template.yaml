@@ -1,13 +1,36 @@
-filesystem:
-  dirs:
-    - /etc
-    - /home
-    - /home/user
-    - /var/log
-    - /test
+id: id_name
+name: "edge case name"
+description: >
+  edge case description
 
-  files:
-    - path: /test/test.txt
-      content: |
-        Hello world
-        This is inside the image.
+filesystem:
+  image_name: "image_name"
+  size_mb: 100
+  has_journal: false
+  mkfs_extra_opts: "-E lazy_itable_init=0,lazy_journal_init=0"
+
+steps:
+  - type: mkfs              # dd + mkfs.ext4
+  - type: mount             # mount via loop
+  - type: chown_mount       # chown to $USER (optional)
+
+  - type: mkdir
+    path: "/testtxts"
+
+  - type: write_file
+    path: "/testtxts/file1.txt"
+    content: "hello world"
+
+  - type: get_inode         # store inode number in a variable
+    path: "/testtxts/file1.txt"
+    store_as: "FILE1_INO"
+
+  - type: debugfs_script    # run a batch of debugfs commands
+    commands:
+      - "rm /testtxts/file1.txt"
+      - "mi <${FILE1_INO}>"
+
+  - type: umount
+
+expected:
+  notes: "Inode ${FILE1_INO} should exist but be unreachable from any directory."
