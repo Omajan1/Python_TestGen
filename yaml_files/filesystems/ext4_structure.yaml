@@ -1,0 +1,27 @@
+filesystem:
+  image_name: "ext4-test.img"
+  size_mb: 100
+  mount_dir: "output_images/mounted/default"   # relative to project root
+  image_path: "output_images/ext4-test.img"    # optional override
+
+structure:
+  directories:
+    - path: "/"
+    - path: "/testtxts"
+    - path: "/logs"
+
+  files:
+    - path: "/README.txt"
+      mode: "0644"
+      content: |
+        This is a test ext4 filesystem.
+
+    - path: "/testtxts/file1.txt"
+      mode: "0644"
+      content: "helloworld"
+
+    - path: "/logs/app.log"
+      mode: "0600"
+      content: |
+        Log initialized.
+        First line.
