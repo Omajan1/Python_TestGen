@@ -31,10 +31,8 @@ sudo mount -o loop "$IMG_PATH" "$MNT_DIR"
 # sudo chown -R "$USER:$USER" "$MNT_DIR"
 
 # Space for normal filesystem calls/operations.
-cd "$MNT_DIR"
-mkdir -p testtxts
-cd testtxts
-echo "helloworld" > testfile.txt
+
+#PLACEHOLDER#
 
 # Manipulate the ext4 structures directly in the image file using debugfs
 
