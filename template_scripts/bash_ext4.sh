@@ -29,10 +29,10 @@ sudo mount -o loop "$IMG_PATH" "$MNT_DIR"
 
 # Space for normal filesystem calls/operations.
 
-#PLACEHOLDER# Adding directories #
+# Adding directories [ph] #
 
 
-#PLACEHOLDER# Adding files #
+# Adding files [ph] #
 
 
 # Manipulate the ext4 structures directly in the image file using debugfs

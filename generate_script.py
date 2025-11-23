@@ -39,7 +39,7 @@ class Generator():
     def change_size(self):
         pass
 
-    def add_files(self):
+    def add_files(self, yaml_file, og_content, placeholder_dir):
         pass
 
     def change_name(self):
@@ -54,8 +54,8 @@ class Generator():
 
         # Change script
         self.change_size()
-        self.add_dir(yaml_, content, "#PLACEHOLDER# Adding directories #")
-        self.add_files()
+        self.add_dir(yaml_, content, "# Adding directories [ph] #")
+        self.add_files(yaml_, content, "# Adding files [ph] #")
 
         pass
 
