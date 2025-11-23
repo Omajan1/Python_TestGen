@@ -19,26 +19,48 @@ class Generator():
         return script_path
     
     def find_yaml_path(self):
-        yaml_path = f"{self.args.format_yaml}"
-        
+        yaml_name = f"{self.args.format_yaml}"
+        return yaml_name
+    
+    def add_dir(self, yaml_file, og_content, placeholder_dir):
+        # Split at the placeholder
+        before, after = og_content.split(placeholder_dir, 1)
+
+        text_to_insert = "\n"
+
+        for dir in yaml_file["structure"]["directories"]:
+            text_to_insert += "mkdir " + dir["path"] + "\n"
+
+        new_content = before + placeholder_dir + "\n" + text_to_insert + "\n" + after
+
+        with open(self.find_template_path(), "w") as f:
+            f.write(new_content)
+
+    def change_size(self):
+        pass
+
+    def add_files(self):
+        pass
+
+    def change_name(self):
+        pass
 
     def modify_template(self):
-        with open(yaml_path, "r") as f:
-            yaml = yaml.safe_load(f)
+        with open(self.find_yaml_path(), "r") as f:
+            yaml_ = yaml.safe_load(f)
         
-        with open(script_path, "r") as f:
+        with open(self.find_template_path(), "r") as f:
             content = f.read()
 
-        # 2) Create directories
-        for d in structure.get("directories", []):
-            
+        # Change script
+        self.change_size()
+        self.add_dir(yaml_, content, "#PLACEHOLDER# Adding directories #")
+        self.add_files()
 
-        content = content.replace("#PLACEHOLDER#", "paste from loop")
-
+        pass
 
     def main(self):
-        script_path = self.find_template()
-        self.modify_template(script_path)
+        self.modify_template()
         pass
 
 if __name__ == "__main__":

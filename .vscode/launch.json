@@ -1,0 +1,16 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["--script_lang", "bash", "--file_system", "ext4", "--format_yaml", "C:/Users/snell/Desktop/Github/Python_TestGen/yaml_files/filesystems/ext4_structure.yaml", ],
+        }
+    ]
+}

@@ -27,12 +27,13 @@ mkdir -p "$MNT_DIR"
 # Mount the filesystem using a loop device
 sudo mount -o loop "$IMG_PATH" "$MNT_DIR"
 
-# Optional: give your user ownership so you don't need sudo for every file op
-# sudo chown -R "$USER:$USER" "$MNT_DIR"
-
 # Space for normal filesystem calls/operations.
 
-#PLACEHOLDER#
+#PLACEHOLDER# Adding directories #
+
+
+#PLACEHOLDER# Adding files #
+
 
 # Manipulate the ext4 structures directly in the image file using debugfs
 
