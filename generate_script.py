@@ -30,7 +30,7 @@ class Generator():
         before, after = content.split(placeholder_dir, 1)
 
         # Loop through dir
-        text_to_insert = "\n"
+        text_to_insert = ""
 
         for dir in self.yaml_file["structure"]["directories"]:
             text_to_insert += "mkdir " + dir["path"] + "\n"
@@ -41,7 +41,7 @@ class Generator():
         with open(self.find_template_path(), "w") as f:
             f.write(new_content)
 
-    def change_size(self):
+    def change_size_name(self):
         with open(self.find_template_path(), "r") as f:
             content = f.read()
 
@@ -54,23 +54,32 @@ class Generator():
             f.write(new_content)
 
     def add_files(self, placeholder_dir):
-        pass
+        with open(self.find_template_path(), "r") as f:
+            content = f.read()
 
-    def add_file_permissions(self, placeholder_dir):
-        pass
+        # Split at the placeholder
+        before, after = content.split(placeholder_dir, 1)
 
-    def change_name(self):
-        pass
+        # Loop through files
+        text_to_insert = ""
+
+        for dir in self.yaml_file["structure"]["files"]:
+            text_to_insert += "touch " + dir["path"] + "\n"
+
+        new_content = before + placeholder_dir + "\n" + text_to_insert + "\n" + after
+
+        # Add to file
+        with open(self.find_template_path(), "w") as f:
+            f.write(new_content)
 
     def modify_template(self):
         with open(self.find_yaml_path(), "r") as f:
             self.yaml_file = yaml.safe_load(f)
 
         # Change script
-        self.change_size()
+        self.change_size_name()
         self.add_dir("# Adding directories [ph] #")
         self.add_files("# Adding files [ph] #")
-        self.add_file_permissions("# Adding file permissions [ph] #")
 
         pass
 
