@@ -72,7 +72,7 @@ class Generator():
         before, after = content.split(placeholder_dir, 1)
 
         # Loop through dir
-        text_to_insert = "\n"
+        text_to_insert = ""
 
         for dir in self.yaml_file["structure"]["directories"]:
             text_to_insert += "mkdir " + dir["path"] + "\n"
@@ -83,7 +83,7 @@ class Generator():
         with open(self.find_template_path(), "w") as f:
             f.write(new_content)
 
-    def change_size(self):
+    def change_size_name(self):
         with open(self.find_template_path(), "r") as f:
             content = f.read()
 
