@@ -2,25 +2,67 @@ import argparse
 # import subprocess
 import yaml
 import os
+import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 class Generator():
     def __init__(self, args):
         self.args = args
-        self.yaml_file = ""
+
+        self.mod_yaml_paths = []
+        self.template_paths = []
 
     def find_template_path(self):
-        full_name = f"{self.args.script_lang}_{self.args.file_system}"
-        
-        if self.args.script_lang == "bash":
-            full_name += ".sh"
+        logging.info("Finding template script to use...")
 
-        script_path = os.path.abspath(f"{os.getcwd()}/template_scripts/{full_name}")
-        return script_path
+        for script_lang_ in self.args.script_lang:
+            # Getting full script name
+            full_name = f"{script_lang_}_{self.args.file_system}"
+            
+            if script_lang_ == "bash":
+                full_name += ".sh"
+            elif script_lang_ == "powershell":
+                full_name += ".ps1"
+
+            # Getting full path
+            script_path = os.path.abspath(f"{os.getcwd()}/template_scripts/{full_name}")
+
+            if os.path.exists(script_path):
+                logging.info(f"Found template file to use: {script_path}")
+
+                self.template_paths.append(script_path)
+            else:
+                logging.error("Template script path not found!")
+                logging.info(f"Template script path we tried: {script_path}")
+
+                return False
+        
+        if len(self.template_paths) == len(self.args.script_lang):
+            return True
+
     
-    def find_yaml_path(self):
-        yaml_name = f"{self.args.format_yaml}"
-        return yaml_name
+    def find_mod_yaml_path(self):
+        logging.info("Finding yaml files...")
+
+        for mod_yaml_name in self.args.mod_yaml:
+            yaml_path = os.path.abspath(mod_yaml_name)
+
+            if os.path.exists(yaml_path):
+                logging.info(f"Found mod yaml file to use: {yaml_path}")
+
+                self.mod_yaml_paths.append(yaml_path)
+            else:
+                logging.error("Mod yaml path not found!")
+                logging.info(f"Mod yaml path we tried: {yaml_path}")
+
+                return False
+        
+        if len(self.mod_yaml_paths) == len(self.args.mod_yaml):
+            return True
     
     def add_dir(self, placeholder_dir):
         with open(self.find_template_path(), "r") as f:
@@ -53,38 +95,28 @@ class Generator():
         with open(self.find_template_path(), "w") as f:
             f.write(new_content)
 
-    def add_files(self, placeholder_dir):
-        pass
-
-    def add_file_permissions(self, placeholder_dir):
-        pass
-
-    def change_name(self):
-        pass
-
-    def modify_template(self):
-        with open(self.find_yaml_path(), "r") as f:
-            self.yaml_file = yaml.safe_load(f)
-
-        # Change script
-        self.change_size()
-        self.add_dir("# Adding directories [ph] #")
-        self.add_files("# Adding files [ph] #")
-        self.add_file_permissions("# Adding file permissions [ph] #")
-
-        pass
-
     def main(self):
-        self.modify_template()
-        pass
+        if not self.find_template_path():
+            logging.error("Error, closing program...")
+            exit(code=1)
+        
+        if self.args.base_yaml != "":
+            if not self.find_mod_yaml_path():
+                logging.error("Error, closing program...")
+                exit(code=1)
+
+
+def parse_list(value):
+    return value.split(",")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--script_lang", help="The script language we will generate the code in (bash, powershell (doesnt work as of now))", required=True)
+    parser.add_argument("--script_lang", help="The script language we will generate the code in (bash, powershell (doesnt work as of now))", required=True, type=parse_list)
     parser.add_argument("--file_system", help="The file system you want to generate (ext4 (for now))", required=True)
-    parser.add_argument("--format_yaml", help="The yaml file in which the specifics of the filesystem are specified, such as filenames and directories", required=False)
-    parser.add_argument("--os", help="The os files you want on the filesystem (expirimental, not implemented yet)", required=False)
+
+    parser.add_argument("--mod_yaml", help="The yaml file which will specify all modifications (besides the mod file) like directories, files etc.", required=True, type=parse_list)
+
     parser.add_argument("--output_dir", help="The output directory", required=False, default="./output")
 
     args = parser.parse_args()

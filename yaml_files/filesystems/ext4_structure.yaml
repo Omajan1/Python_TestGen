@@ -3,23 +3,6 @@ filesystem:
   size_mb: 100
 
 structure:
-  directories:
-    - path: "/"
-    - path: "/testtxts"
-    - path: "/logs"
+  - base: "base1"
 
-  files:
-    - path: "/README.txt"
-      mode: "0644"
-      content: |
-        This is a test ext4 filesystem.
-
-    - path: "/testtxts/file1.txt"
-      mode: "0644"
-      content: "helloworld"
-
-    - path: "/logs/app.log"
-      mode: "0600"
-      content: |
-        Log initialized.
-        First line.
+  - file: "/test2/hello.txt"

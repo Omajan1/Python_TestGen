@@ -1,0 +1,8 @@
+filesystem:
+  image_name: "ext4-test_1.img"
+  size_mb: 100
+
+structure:
+  - base: "base1"
+
+  - file: "/test3/hello.txt"
