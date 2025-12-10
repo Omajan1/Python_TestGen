@@ -1,8 +1,8 @@
 {
     "bash": {
-        "dir": "mkdir [value1]",
-        "file_c": "touch [value1]",
-        "file_w": "echo [value2] > [value2]",
-        "file_a": "echo [value2] >> [value2]"
+        "dir": "mkdir <value1>",
+        "file_c": "touch <value1>",
+        "file_w": "echo <value2> > <value2>",
+        "file_a": "echo <value2> >> <value2>"
     }
 }
