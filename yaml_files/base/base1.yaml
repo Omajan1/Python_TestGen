@@ -1,9 +1,9 @@
 structure:
-  - dir: "/"
-  - dir: "/test"
-  - dir: "/test2"
-  - dir: "/test/test3"
-  - dir: "/test2/test4"
+  - dir: ["/"]
+  - dir: ["/test"]
+  - dir: ["/test2"]
+  - dir: ["/test/test3"]
+  - dir: ["/test2/test4"]
 
-  - file: "/hello.txt"
-  - file: "/test/hello.txt"
+  - file_c: ["/hello.txt"]
+  - file_w: ["/test/hello.txt", "Hello Test"]

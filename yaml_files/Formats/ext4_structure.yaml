@@ -1,0 +1,9 @@
+filesystem:
+  image_name: "ext4-test.img"
+  size_mb: 100
+
+structure:
+  - base: ["base1"]
+
+  - file_w: ["/test2/hello.txt", "Hello test 2"]
+  - file_a: ["/test2/hello.txt", "Hello test 2 again"]
