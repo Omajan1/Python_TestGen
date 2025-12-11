@@ -1,4 +1,9 @@
 {
+    "system": {
+        "base_location": [
+            "./yaml_files/base/"
+        ]
+    },
     "bash": {
         "dir": "mkdir <value1>",
         "file_c": "touch <value1>",

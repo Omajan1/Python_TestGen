@@ -1,5 +1,5 @@
 filesystem:
-  image_name: "ext4-test.img"
+  image_name: "ext4-test"
   size_mb: 100
 
 structure:

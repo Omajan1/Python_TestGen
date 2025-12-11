@@ -1,8 +1,9 @@
 import argparse
 # import subprocess
-import yaml
+import yaml 
 import os
 import logging
+import json
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,9 +13,16 @@ logging.basicConfig(
 class Generator():
     def __init__(self, args):
         self.args = args
+        self.config = self.load_config()
 
         self.mod_yaml_paths = []
         self.template_paths = []
+
+    def load_config(self):
+        with open("./config/config.json") as f:
+            json_dict = json.load(f)
+
+        return json_dict
 
     def find_template_path(self):
         logging.info("Finding template script to use...")
@@ -48,7 +56,7 @@ class Generator():
     def find_mod_yaml_path(self):
         logging.info("Finding yaml files...")
 
-        for mod_yaml_name in self.args.mod_yaml:
+        for mod_yaml_name in self.args.yaml:
             yaml_path = os.path.abspath(mod_yaml_name)
 
             if os.path.exists(yaml_path):
@@ -61,7 +69,7 @@ class Generator():
 
                 return False
         
-        if len(self.mod_yaml_paths) == len(self.args.mod_yaml):
+        if len(self.mod_yaml_paths) == len(self.args.yaml):
             return True
     
     def add_dir(self, placeholder_dir):
@@ -95,15 +103,67 @@ class Generator():
         with open(self.find_template_path(), "w") as f:
             f.write(new_content)
 
+    def generate_script(self, template, yaml_file):
+        # Vars
+        commands_final = ""
+        image_name = ""
+        image_size = ""
+        
+        # Load in files
+        with open(template) as template:
+            template_copy = template.read()
+        
+        with open(yaml_file, "r", encoding="utf-8") as f:
+            yaml_copy = yaml.safe_load(f)
+
+        # Init vars
+        image_name = yaml_copy["filesystem"]["image_name"]
+        image_size = yaml_copy["filesystem"]["size_mb"]
+
+        # Go through logic of yaml line by line
+        def append_command(self, yaml_file_structure):
+            for command in yaml_file_structure:
+                for key, val in command.items():
+
+                    if key == "base":
+                        for base_image_name in val:
+                            base_confirmation = self.base_excists(base_image_name)
+
+                            if base_confirmation:
+                                with open(base_confirmation, "r", encoding="utf-8") as f:
+                                    base_yaml = yaml.safe_load(f)
+
+                                append_command(self, base_yaml["structure"])
+                            else: 
+                                logging.warning(f"Base image not found, looked for {base_image_name}")
+
+        append_command(self, yaml_file_structure=yaml_copy["structure"])
+
+        pass
+
+    def base_excists(self, base_name):
+        for base_loc_in_config in self.config["system"]["base_location"]:
+            base_location = os.path.abspath(f"{base_loc_in_config}{base_name}.yaml")
+
+            if os.path.exists(base_location):
+                return base_location
+        return False
+
     def main(self):
         if not self.find_template_path():
             logging.error("Error, closing program...")
             exit(code=1)
         
-        if self.args.base_yaml != "":
-            if not self.find_mod_yaml_path():
-                logging.error("Error, closing program...")
-                exit(code=1)
+        if not self.find_mod_yaml_path():
+            logging.error("Error, closing program...")
+            exit(code=1)
+
+        for template in self.template_paths:
+            for yaml_file in self.mod_yaml_paths:
+                self.generate_script(template=template, yaml_file=yaml_file)
+        pass
+
+        
 
 
 def parse_list(value):
@@ -115,7 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("--script_lang", help="The script language we will generate the code in (bash, powershell (doesnt work as of now))", required=True, type=parse_list)
     parser.add_argument("--file_system", help="The file system you want to generate (ext4 (for now))", required=True)
 
-    parser.add_argument("--mod_yaml", help="The yaml file which will specify all modifications (besides the mod file) like directories, files etc.", required=True, type=parse_list)
+    parser.add_argument("--yaml", help="The yaml file which will specify all modifications (besides the mod file) like directories, files etc.", required=True, type=parse_list)
 
     parser.add_argument("--output_dir", help="The output directory", required=False, default="./output")
 
