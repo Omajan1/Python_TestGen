@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--script_lang", "bash", "--file_system", "ext4", "--yaml", "A:\\Github Clones\\Python_TestGen\\yaml_files\\Formats\\ext4_structure.yaml"],
+            "args": ["--script_lang", "bash", "--file_system", "ext4_default", "--yaml", "A:\\Github Clones\\Python_TestGen\\yaml_files\\Formats\\ext4_structure.yaml", "--output_script_name", "test_scripts"],
         }
     ]
 }

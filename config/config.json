@@ -5,9 +5,14 @@
         ]
     },
     "bash": {
-        "dir": "mkdir <value1>",
-        "file_c": "touch <value1>",
-        "file_w": "echo <value2> > <value2>",
-        "file_a": "echo <value2> >> <value2>"
+        "commands": {
+            "dir": "mkdir <value1>",
+            "file_c": "touch <value1>",
+            "file_w": "echo \"<value2>\" > <value1>",
+            "file_a": "echo \"<value2>\" >> <value1>"
+        },
+        "filesystem": {
+            "ext4_default": "mkfs.ext4 -O ^has_journal -E lazy_itable_init=0,lazy_journal_init=0 \"$IMG_PATH\""
+        }
     }
 }

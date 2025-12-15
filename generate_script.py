@@ -18,6 +18,8 @@ class Generator():
         self.mod_yaml_paths = []
         self.template_paths = []
 
+        self.commands_final = ""
+
     def load_config(self):
         with open("./config/config.json") as f:
             json_dict = json.load(f)
@@ -29,7 +31,7 @@ class Generator():
 
         for script_lang_ in self.args.script_lang:
             # Getting full script name
-            full_name = f"{script_lang_}_{self.args.file_system}"
+            full_name = f"{script_lang_}_template"
             
             if script_lang_ == "bash":
                 full_name += ".sh"
@@ -91,40 +93,33 @@ class Generator():
         with open(self.find_template_path(), "w") as f:
             f.write(new_content)
 
-    def change_size_name(self):
-        with open(self.find_template_path(), "r") as f:
-            content = f.read()
+    def return_script_lang_from_extention(self, extention):
+        if extention == "sh":
+            return "bash"
+        if extention == "ps1":
+            return "powershell"
 
-        # Replace
-        new_content = content.replace("--NAME--", self.yaml_file["filesystem"]["image_name"])
-        new_content = new_content.replace("--SIZE--", str(self.yaml_file["filesystem"]["size_mb"]))
-
-        # Add to file
-        with open(self.find_template_path(), "w") as f:
-            f.write(new_content)
-
-    def generate_script(self, template, yaml_file):
-        # Vars
-        commands_final = ""
-        image_name = ""
-        image_size = ""
-        
+    def generate_script(self, template_name, yaml_file):
         # Load in files
-        with open(template) as template:
-            template_copy = template.read()
+        with open(template_name) as template:
+            template_content = template.read()
         
         with open(yaml_file, "r", encoding="utf-8") as f:
             yaml_copy = yaml.safe_load(f)
 
         # Init vars
         image_name = yaml_copy["filesystem"]["image_name"]
-        image_size = yaml_copy["filesystem"]["size_mb"]
+        image_size = str(yaml_copy["filesystem"]["size_mb"])
+
+        # Initial replacement
+        template_content = template_content.replace("--NAME--", image_name)
+        template_content = template_content.replace("--SIZE--", image_size)
+        template_content = template_content.replace("<start mkfs>", f"<start mkfs>\n{self.config[self.return_script_lang_from_extention(template_name.rsplit(".", 1)[1])]["filesystem"][self.args.file_system]}")
 
         # Go through logic of yaml line by line
-        def append_command(self, yaml_file_structure):
-            for command in yaml_file_structure:
-                for key, val in command.items():
-
+        def append_command(self, yaml_file_structure, template_name):
+            for yaml_command in yaml_file_structure:
+                for key, val in yaml_command.items():
                     if key == "base":
                         for base_image_name in val:
                             base_confirmation = self.base_excists(base_image_name)
@@ -133,13 +128,27 @@ class Generator():
                                 with open(base_confirmation, "r", encoding="utf-8") as f:
                                     base_yaml = yaml.safe_load(f)
 
-                                append_command(self, base_yaml["structure"])
+                                append_command(self, base_yaml["structure"], template_name)
                             else: 
                                 logging.warning(f"Base image not found, looked for {base_image_name}")
 
-        append_command(self, yaml_file_structure=yaml_copy["structure"])
+                    # Commands
+                    else:
+                        cmd = self.config[self.return_script_lang_from_extention(template_name.rsplit(".", 1)[1])]["commands"][key]
+                        
+                        i = 1
+                        for value in yaml_command[key]:
+                            cmd = cmd.replace(f"<value{i}>", value)
+                            i += 1
+                            
+                        self.commands_final += cmd + "\n"
 
-        pass
+        append_command(self, yaml_copy["structure"], template_name)
+
+        template_content = template_content.replace("<start ops>", f"<start ops>\n{self.commands_final}")
+
+        with open(f"{self.args.output_dir}/{self.args.output_script_name}.{template_name.rsplit(".", 1)[1]}", "w", encoding="utf-8") as output_script:
+            output_script.write(template_content)
 
     def base_excists(self, base_name):
         for base_loc_in_config in self.config["system"]["base_location"]:
@@ -160,7 +169,7 @@ class Generator():
 
         for template in self.template_paths:
             for yaml_file in self.mod_yaml_paths:
-                self.generate_script(template=template, yaml_file=yaml_file)
+                self.generate_script(template_name=template, yaml_file=yaml_file)
         pass
 
         
@@ -177,7 +186,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--yaml", help="The yaml file which will specify all modifications (besides the mod file) like directories, files etc.", required=True, type=parse_list)
 
-    parser.add_argument("--output_dir", help="The output directory", required=False, default="./output")
+    parser.add_argument("--output_dir", help="The output directory", required=False, default="./output_scripts")
+    parser.add_argument("--output_script_name", help="The output directory", required=True)
 
     args = parser.parse_args()
 
